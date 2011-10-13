@@ -16,11 +16,17 @@
 #define PROMPT "==>"
 #define DELIMINATORS " \n\t"
 
-int main(void) {
+extern char** environ;
+
+int main(int argc, char* argv[]) {
 	//Create Buffers for IO
 	char input[BUFSIZE], output[BUFSIZE];
 	char commands[BUFSIZE];
 	char* args[BUFSIZE];
+
+	if(argc<1) return 0;
+
+	setenv("parent", argv[0], 1);
 
 	//run shell forever until told to exit
 	while(1){
@@ -57,6 +63,12 @@ int main(void) {
 			strcat(commands,"clear");
 		}else if(tokenCount==1&&strcmp(args[0],"quit")==0){
 			break;
+		}else if(tokenCount==1 && strcmp(args[0], "environ")==0) {
+			char** current;
+			for(current=environ; (*current)!=NULL; current++) {
+				fputs(*current, stdout);
+				fputs("\n", stdout);
+			}
 		}else if(tokenCount==1&&strcmp(args[0],"pause")==0){
 			//wait for enter, by taking any input up to it, and not using it.
 			fputs("PAUSED, press enter to continue",stdout);
@@ -79,6 +91,8 @@ int main(void) {
 		//execute the commands specified
 		if(strlen(commands)!=0) {
 			system(commands);
+
+			//uncomment to output system commands for debugging purposes
 			//fputs(commands, stdout);
 			//fputs("\n", stdout);
 		}
