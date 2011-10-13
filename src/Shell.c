@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define BUFSIZE 1000
 #define PROMPT "==>"
@@ -54,7 +56,8 @@ int main(int argc, char* argv[]) {
 
 		//Do some checks on args to determine what to put in command buffer
 		if(tokenCount==1 && strcmp(args[0], "cd")==0) {
-			fputs(strcat(getcwd(output, BUFSIZE), "\n"), stdout);
+			getcwd(output, BUFSIZE);
+			fputs(strcat(output, "\n"), stdout);
 		} else if(tokenCount==2 && strcmp(args[0], "cd")==0) {
 			if(chdir(args[1])==-1) {
 				fputs("path doesn't exist\n", stdout);
@@ -87,6 +90,17 @@ int main(int argc, char* argv[]) {
 				fputs(" ",stdout);
 			}
 			fputs("\n",stdout);
+		}else{
+			pid_t pid=fork();
+			if(pid==0){
+				//child
+				execvp(args[0],args);
+			}else if(pid<0){
+				//error
+			}else{
+				//parent
+				wait(0);
+			}
 		}
 		//execute the commands specified
 		if(strlen(commands)!=0) {
