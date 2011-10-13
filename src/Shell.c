@@ -18,7 +18,7 @@
 
 int main(void) {
 	//Create Buffers for IO
-	char input[BUFSIZE];
+	char input[BUFSIZE], output[BUFSIZE];
 	char commands[BUFSIZE];
 	char* args[BUFSIZE];
 
@@ -27,6 +27,11 @@ int main(void) {
 		int tokenCount;
 		char* token;
 
+		//clear buffers
+		strcpy(input,"");
+		strcpy(output,"");
+		strcpy(commands, "");
+
 		//Put prompt to user and get their input
 		fputs(PROMPT,stdout);
 		fgets(input,BUFSIZE,stdin);
@@ -34,12 +39,21 @@ int main(void) {
 		//Tokenize the users input
 		tokenCount=0;
 		//Loop and store until no more tokens
-		for(token=strtok(input, DELIMINATORS); token!=NULL; token=strtok(NULL, DELIMINATORS), tokenCount++) {
-			args[tokenCount]=token;
+		for(token=strtok(input, DELIMINATORS); token!=NULL; token=strtok(NULL, DELIMINATORS)) {
+			if(strlen(token)!=0) {
+				args[tokenCount]=token;
+				tokenCount++;
+			}
 		}
 
 		//Do some checks on args to determine what to put in command buffer
-		if(tokenCount==1&&strcmp(args[0],"clr")==0){
+		if(tokenCount==1 && strcmp(args[0], "cd")==0) {
+			fputs(strcat(getcwd(output, BUFSIZE), "\n"), stdout);
+		} else if(tokenCount==2 && strcmp(args[0], "cd")==0) {
+			if(chdir(args[1])==-1) {
+				fputs("path doesn't exist\n", stdout);
+			}
+		} else if(tokenCount==1&&strcmp(args[0],"clr")==0){
 			strcat(commands,"clear");
 		}else if(tokenCount==1&&strcmp(args[0],"quit")==0){
 			break;
@@ -48,29 +62,30 @@ int main(void) {
 			fputs("PAUSED, press enter to continue",stdout);
 			char temp2[BUFSIZE];
 			fgets(temp2,BUFSIZE,stdin);
+		}else if(tokenCount==1 && strcmp(args[0], "dir")==0) {
+			strcat(commands, "ls -la");
 		}else if(tokenCount==2&&strcmp(args[0],"dir")==0){
-			strcat(commands,"ls ");
+			strcat(commands,"ls -la ");
 			strcat(commands,args[1]);
 		}else if(tokenCount>1&&strcmp(args[0],"echo")==0){
 			//loop over tokens and output the everything after echo to the screen
-			int j=1;
-			while(j<tokenCount){
+			int j;
+			for(j=1; j<tokenCount; j++){
 				fputs(args[j],stdout);
 				fputs(" ",stdout);
-				j++;
 			}
 			fputs("\n",stdout);
 		}
 		//execute the commands specified
-		system(commands);
+		if(strlen(commands)!=0) {
+			system(commands);
+			//fputs(commands, stdout);
+			//fputs("\n", stdout);
+		}
 
-		//clear buffers
-		strcpy(commands,"");
-		strcpy(input,"");
-		int j=0;
-		while(args[j]!=NULL){
-			strcpy(args[j],"");
-			j++;
+		int j;
+		for(j=0; args[j]!=NULL; j++){
+			args[j]=NULL;
 		}
 	}
 	fputs("Shell Terminated\n\r",stdout);
