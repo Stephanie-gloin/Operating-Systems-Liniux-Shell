@@ -95,6 +95,8 @@ int main(int argc, char* argv[]) {
 			if(pid==0){
 				//child
 				execvp(args[0],args);
+				//child should exit after executing outside program
+				return EXIT_SUCCESS;
 			}else if(pid<0){
 				//error
 			}else{
