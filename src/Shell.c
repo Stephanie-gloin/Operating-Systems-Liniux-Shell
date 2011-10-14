@@ -43,6 +43,8 @@ int main(int argc, char* argv[]) {
 	char commands[BUFSIZE];
 	//Argument buffer. The input commands are tokenized and the tokens stored in this array.
 	char* args[BUFSIZE];
+	char baseDirectory[BUFSIZE];
+	getcwd(baseDirectory, BUFSIZE);
 
 	//The file stream the shell reads input from. This can be stdin or some other stream.
 	FILE * inputStream;
@@ -152,6 +154,11 @@ int main(int argc, char* argv[]) {
 				fputs(" ",stdout);
 			}
 			fputs("\n",stdout); //don't forget the newline
+		}else if(strcmp(args[0],"help")==0){
+			if(!tokenCheck(tokenCount, 1, 1)) continue;
+			strcat(commands,"more ");
+			strcat(commands, baseDirectory);
+			strcat(commands, "/readme");
 		}else{ //Otherwise, assume the command is a system executiable, and try to execute it
 			pid_t pid=fork(); //Fork this process
 			if(pid==0){
