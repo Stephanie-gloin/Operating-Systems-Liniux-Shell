@@ -20,6 +20,15 @@
 
 extern char** environ;
 
+FILE * inputStream;
+int emitPrompt;
+
+int tokenCheck(int count, int min, int max) {
+	if (count>=min && count<=max) return 1;
+	fputs("Invalid number of arguments\n", stdout);
+	return 0;
+}
+
 int main(int argc, char* argv[]) {
 	fputs("Starting Shell\n",stdout);
 	fflush(stdout);
@@ -27,8 +36,6 @@ int main(int argc, char* argv[]) {
 	char input[BUFSIZE], output[BUFSIZE];
 	char commands[BUFSIZE];
 	char* args[BUFSIZE];
-	FILE * inputStream;
-	int emitPrompt;
 
 	if(argc==2){
 		inputStream=fopen(argv[1],"r");
@@ -44,6 +51,8 @@ int main(int argc, char* argv[]) {
 	while(1){
 		int tokenCount;
 		char* token;
+
+		fflush(stdout);
 
 		//clear buffers
 		strcpy(input,"");
@@ -70,34 +79,44 @@ int main(int argc, char* argv[]) {
 		}
 
 		//Do some checks on args to determine what to put in command buffer
-		if(tokenCount==1 && strcmp(args[0], "cd")==0) {
-			getcwd(output, BUFSIZE);
-			fputs(strcat(output, "\n"), stdout);
-		} else if(tokenCount==2 && strcmp(args[0], "cd")==0) {
-			if(chdir(args[1])==-1) {
-				fputs("path doesn't exist\n", stdout);
+		if(strcmp(args[0], "cd")==0) {
+			if(!tokenCheck(tokenCount, 2, 1)) continue;
+			if(tokenCount==1) {
+				getcwd(output, BUFSIZE);
+				fputs(strcat(output, "\n"), stdout);
+			} else {
+				if(chdir(args[1])==-1) {
+					fputs("path doesn't exist\n", stdout);
+				}
 			}
-		} else if(tokenCount==1&&strcmp(args[0],"clr")==0){
+		} else if(strcmp(args[0],"clr")==0){
+			if(!tokenCheck(tokenCount, 1, 1)) continue;
 			strcat(commands,"clear");
-		}else if(tokenCount==1&&strcmp(args[0],"quit")==0){
+		}else if(strcmp(args[0],"quit")==0){
+			if(!tokenCheck(tokenCount, 1, 1)) continue;
 			break;
-		}else if(tokenCount==1 && strcmp(args[0], "environ")==0) {
+		}else if(strcmp(args[0], "environ")==0) {
+			if(!tokenCheck(tokenCount, 1, 1)) continue;
 			char** current;
 			for(current=environ; (*current)!=NULL; current++) {
 				fputs(*current, stdout);
 				fputs("\n", stdout);
 			}
-		}else if(tokenCount==1&&strcmp(args[0],"pause")==0){
+		}else if(strcmp(args[0],"pause")==0){
+			if(!tokenCheck(tokenCount, 1, 1)) continue;
 			//wait for enter, by taking any input up to it, and not using it.
 			fputs("PAUSED, press enter to continue",stdout);
 			char temp2[BUFSIZE];
 			fgets(temp2,BUFSIZE,stdin);
-		}else if(tokenCount==1 && strcmp(args[0], "dir")==0) {
-			strcat(commands, "ls -la");
-		}else if(tokenCount==2&&strcmp(args[0],"dir")==0){
-			strcat(commands,"ls -la ");
-			strcat(commands,args[1]);
-		}else if(tokenCount>1&&strcmp(args[0],"echo")==0){
+		}else if(strcmp(args[0], "dir")==0) {
+			if(!tokenCheck(tokenCount, 1, 2)) continue;
+			if(tokenCount==1) {
+				strcat(commands, "ls -la");
+			} else {
+				strcat(commands,"ls -la ");
+				strcat(commands,args[1]);
+			}
+		}else if(strcmp(args[0],"echo")==0){
 			//loop over tokens and output the everything after echo to the screen
 			int j;
 			for(j=1; j<tokenCount; j++){
@@ -135,8 +154,9 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	fclose(inputStream);
-	fputs("Shell Terminated\n\r",stdout);
+	fputs("Shell Terminated\n\r", stdout);
 	fflush(stdout);
+	fclose(inputStream);
+
 	return EXIT_SUCCESS;
 }
