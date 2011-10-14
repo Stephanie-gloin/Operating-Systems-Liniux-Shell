@@ -1,5 +1,35 @@
-This is a shell program for Lab 2 of Operating Systems.
+README FOR OPERATING SYSTEMS LAB 2, LINUX SHELL:
 
-Hello we've made a change.
+AUTHORS:
 
-Here is another commit test
+Stephanie Gloin 100342062
+Darryl Barnhart 100434653
+Zachary Cook    100398968
+
+BASIC COMMANDS:
+
+-cd : Displays what the current directory is  .
+
+-cd <directory> : Changes the current default directory to <directory>.
+
+-clr : Clears the screen
+
+-dir <directory> : Lists the contents of the directory specified.
+
+-environ : Lists all the enviroment strings.
+
+-echo <comment> : Displays <comment> and then a new line
+
+-help : Displays this help file
+
+-pause : Pauses operation of the shell until 'Enter' is pressed.
+
+-quit: Quits the shell
+
+ADVANCED:
+
+-If you input a command that is not one of these basic commands, 
+the shell will assume it is program invocation and will handle it as such.
+
+-To have the shell run command line arguements from a file, 
+the command line argument must be "shell <batchfile>".
