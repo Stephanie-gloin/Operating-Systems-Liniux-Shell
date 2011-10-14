@@ -21,12 +21,22 @@
 extern char** environ;
 
 int main(int argc, char* argv[]) {
+	fputs("Starting Shell\n",stdout);
+	fflush(stdout);
 	//Create Buffers for IO
 	char input[BUFSIZE], output[BUFSIZE];
 	char commands[BUFSIZE];
 	char* args[BUFSIZE];
+	FILE *fileToRead;
 
-	if(argc<1) return 0;
+	fflush(stdout);
+	if(argc<1){
+		fputs("NO ARGUMENTS\n",stdout);
+		fflush(stdout);
+		return 0;
+	}else if(argc==2){
+		fileToRead=fopen(argv[1],"r");
+	}
 
 	setenv("parent", argv[0], 1);
 
@@ -39,10 +49,18 @@ int main(int argc, char* argv[]) {
 		strcpy(input,"");
 		strcpy(output,"");
 		strcpy(commands, "");
-
-		//Put prompt to user and get their input
-		fputs(PROMPT,stdout);
-		fgets(input,BUFSIZE,stdin);
+		if(fileToRead==NULL){
+			//Put prompt to user and get their input
+			fputs(PROMPT,stdout);
+			fgets(input,BUFSIZE,stdin);
+		}else{
+			//gets line and if EOF closes and exits
+			if(fgets(input,BUFSIZE,fileToRead)==NULL){
+				//runs when EOF
+				fclose(fileToRead);
+				break;
+			}
+		}
 
 		//Tokenize the users input
 		tokenCount=0;
