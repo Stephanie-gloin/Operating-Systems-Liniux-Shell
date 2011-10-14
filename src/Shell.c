@@ -29,7 +29,6 @@ int main(int argc, char* argv[]) {
 	char* args[BUFSIZE];
 	FILE *fileToRead;
 
-	fflush(stdout);
 	if(argc<1){
 		fputs("NO ARGUMENTS\n",stdout);
 		fflush(stdout);
