@@ -27,14 +27,15 @@ int main(int argc, char* argv[]) {
 	char input[BUFSIZE], output[BUFSIZE];
 	char commands[BUFSIZE];
 	char* args[BUFSIZE];
-	FILE *fileToRead;
+	FILE * inputStream;
+	int emitPrompt;
 
-	if(argc<1){
-		fputs("NO ARGUMENTS\n",stdout);
-		fflush(stdout);
-		return 0;
-	}else if(argc==2){
-		fileToRead=fopen(argv[1],"r");
+	if(argc==2){
+		inputStream=fopen(argv[1],"r");
+		emitPrompt=0;
+	} else {
+		inputStream=stdin;
+		emitPrompt=1;
 	}
 
 	setenv("parent", argv[0], 1);
@@ -48,18 +49,15 @@ int main(int argc, char* argv[]) {
 		strcpy(input,"");
 		strcpy(output,"");
 		strcpy(commands, "");
-		if(fileToRead==NULL){
-			//Put prompt to user and get their input
+
+		if(emitPrompt) {
 			fputs(PROMPT,stdout);
-			fgets(input,BUFSIZE,stdin);
-		}else{
-			//gets line and if EOF closes and exits
-			if(fgets(input,BUFSIZE,fileToRead)==NULL){
-				//runs when EOF
-				fclose(fileToRead);
-				break;
-			}
 		}
+
+		if(feof(inputStream))
+			break;
+		if(fgets(input,BUFSIZE,inputStream)==NULL)
+			break;
 
 		//Tokenize the users input
 		tokenCount=0;
@@ -116,6 +114,7 @@ int main(int argc, char* argv[]) {
 				return EXIT_SUCCESS;
 			}else if(pid<0){
 				//error
+				return 0;
 			}else{
 				//parent
 				wait(0);
@@ -135,6 +134,8 @@ int main(int argc, char* argv[]) {
 			args[j]=NULL;
 		}
 	}
+
+	fclose(inputStream);
 	fputs("Shell Terminated\n\r",stdout);
 	fflush(stdout);
 	return EXIT_SUCCESS;
