@@ -88,6 +88,10 @@ int main(int argc, char* argv[]) {
 		}
 
 		if(emitPrompt) { //emit the prompt if requested
+			//put in the cwd with the prompt
+			char cwd[BUFSIZE];
+			getcwd(cwd,BUFSIZE);
+			fputs(cwd,stdout);
 			fputs(PROMPT,stdout);
 		}
 
