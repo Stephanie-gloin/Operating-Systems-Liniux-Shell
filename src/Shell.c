@@ -110,6 +110,11 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
+		if(tokenCount<1){
+			//no tokens, read from input again.
+			continue;
+		}
+
 		//Checks on args to determine the command given
 		if(strcmp(args[0], "cd")==0) { //Current Directory
 			if(!tokenCheck(tokenCount, 1, 2)) continue; //ensure there's only up to 1 extra argument
